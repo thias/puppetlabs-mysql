@@ -1,26 +1,26 @@
 [mysqld]
-datadir = <%= datadir %>
-socket = <%= socket %>
+datadir = <%= @datadir %>
+socket = <%= @socket %>
 user = mysql
 # Disabling symbolic-links is recommended to prevent assorted security risks
 symbolic-links = 0
 innodb-file-per-table = 1
-<% if default_engine != 'UNSET' -%>
-default-storage-engine = <%= default_engine %>
+<% if @default_engine != 'UNSET' -%>
+default-storage-engine = <%= @default_engine %>
 <% end -%>
-<% if ssl == true -%>
-ssl-ca = <%= ssl_ca %>
-ssl-cert = <%= ssl_cert %>
-ssl-key = <%= ssl_key %>
+<% if @ssl == true -%>
+ssl-ca = <%= @ssl_ca %>
+ssl-cert = <%= @ssl_cert %>
+ssl-key = <%= @ssl_key %>
 <% end -%>
 
 [mysqld_safe]
-<% if log_error == 'syslog' -%>
+<% if @log_error == 'syslog' -%>
 syslog
 <% else -%>
-log-error = <%= log_error %>
+log-error = <%= @log_error %>
 <% end -%>
-pid-file = <%= pidfile %>
+pid-file = <%= @pidfile %>
 
 # Include any configuration snippets, with possible overrides
 !includedir /etc/mysql/conf.d/
