@@ -21,7 +21,8 @@ class mysql::server (
   $service_provider = $mysql::params::service_provider,
   $config_hash      = {},
   $enabled          = true,
-  $manage_service   = true
+  $manage_service   = true,
+  $backup           = false
 ) inherits mysql::params {
 
   Class['mysql::server'] -> Class['mysql::config']
@@ -50,4 +51,10 @@ class mysql::server (
       provider => $service_provider,
     }
   }
+
+  if $backup {
+    # Rely on hiera to look parameters up when using this
+    include '::mysql::backup'
+  }
+
 }

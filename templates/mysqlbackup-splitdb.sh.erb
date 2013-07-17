@@ -1,0 +1,78 @@
+#!/bin/sh
+#
+#      MYSQL BACKUP SCRIPT
+#      This script provide basic data and structure backup
+#
+
+YYYYMMDD=`date +%Y%m%d`
+KEEPDAYS=<%= @backupdays %>
+WEEKDIR="<%= @backupdir %>/day"
+MONTHDIR="<%= @backupdir %>/month"
+MYSQLUSER=<%= @backupuser %>
+MYSQLPASS=<%= @backuppassword %>
+MYSQLDIR="/var/lib/mysql"
+
+
+die() {
+    echo $*
+    exit 1
+}
+
+
+# Sanity checks
+test -d  "${MONTHDIR}" || die "Please create ${MONTHDIR} directory."
+test -d  "${WEEKDIR}"  || die "Please create ${WEEKDIR} directory."
+
+# Checking day of the month
+if [ "`date +%d`" == "01" ]; then
+    DESTDIR=${MONTHDIR}
+else
+    DESTDIR=${WEEKDIR}
+fi
+
+
+echo
+echo "MySQL Backup"
+echo "============"
+echo
+
+echo "Dumping all databases"
+echo "====================="
+cd ${MYSQLDIR} || die "Cannot get into data directory."
+for database in `mysql --skip-column-names -e "show databases"`; do
+    if [ ! -d ${DESTDIR}/$database ]; then
+        mkdir ${DESTDIR}/$database || die "Cannot create $database dir."
+    fi
+    STARTTIME=`date +%s`
+    echo -n "Performing MySQL database $database dump... "
+    if [ "${database}" = "mysql" ]; then
+      OPTIONS="--events --ignore-table=mysql.event"
+    else
+      OPTIONS=""
+    fi
+    mysqldump -u${MYSQLUSER} -p${MYSQLPASS} $database ${OPTIONS} --skip-lock-tables --single-transaction --no-autocommit <% if @backupcompress %>| bzip2 -9 <% end %>> ${DESTDIR}/$database/$database-${YYYYMMDD}.sql<% if @backupcompress %>.bz2<% end %>
+
+    # Get end time and size
+    SIZE=`nice du -h ${DESTDIR}/$database/$database-${YYYYMMDD}.sql* | cut -f1`
+    ENDTIME=`date +%s`
+    RUNTIME=`expr ${ENDTIME} - ${STARTTIME}`
+    echo "${SIZE} (${RUNTIME}s)"
+done
+
+echo
+echo "Clean up all backups"
+echo "===================="
+echo "Removing daily dumps over ${KEEPDAYS} days old..."
+find ${WEEKDIR} -maxdepth 2 -mindepth 2 -mtime +${KEEPDAYS} | xargs rm -rf
+echo
+
+RETVAL=$?
+
+if [ ${RETVAL} -ne 0 ]; then
+    echo "Error during database dump, please check!" >&2
+    exit 1
+else
+    echo "Database dump completed, no errors reported."
+    exit 0
+fi
+

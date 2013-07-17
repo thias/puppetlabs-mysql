@@ -27,7 +27,9 @@ class mysql::backup (
   $backupuser,
   $backuppassword,
   $backupdir,
+  $backupdays = '5',
   $backupcompress = true,
+  $backupsplitdb = false,
   $ensure = 'present'
 ) {
 
@@ -39,7 +41,7 @@ class mysql::backup (
   }
 
   database_grant { "${backupuser}@localhost":
-    privileges => [ 'Select_priv', 'Reload_priv', 'Lock_tables_priv', 'Show_view_priv' ],
+    privileges => [ 'Select_priv', 'Reload_priv', 'Lock_tables_priv', 'Show_view_priv', 'Event_priv' ],
     require    => Database_user["${backupuser}@localhost"],
   }
 
@@ -52,13 +54,17 @@ class mysql::backup (
     require => File['mysqlbackup.sh'],
   }
 
+  $backup_template = $backupsplitdb ? {
+    true  => 'mysql/mysqlbackup-splitdb.sh.erb',
+    false => 'mysql/mysqlbackup.sh.erb',
+  }
   file { 'mysqlbackup.sh':
     ensure  => $ensure,
     path    => '/usr/local/sbin/mysqlbackup.sh',
     mode    => '0700',
     owner   => 'root',
     group   => 'root',
-    content => template('mysql/mysqlbackup.sh.erb'),
+    content => template($backup_template),
   }
 
   file { 'mysqlbackupdir':
@@ -68,4 +74,16 @@ class mysql::backup (
     owner  => 'root',
     group  => 'root',
   }
+  if $backupsplitdb {
+    file { [
+      "${backupdir}/day",
+      "${backupdir}/month",
+    ]:
+      ensure => 'directory',
+      mode   => '0700',
+      owner  => 'root',
+      group  => 'root',
+    }
+  }
+
 }
