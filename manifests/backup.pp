@@ -30,6 +30,7 @@ class mysql::backup (
   $backupdays = '5',
   $backupcompress = true,
   $backupsplitdb = false,
+  $backupsilent = true,
   $ensure = 'present'
 ) {
 
@@ -45,9 +46,14 @@ class mysql::backup (
     require    => Database_user["${backupuser}@localhost"],
   }
 
+  if $backupsilent {
+    $cron_command = '/usr/local/sbin/mysqlbackup.sh >/dev/null'
+  } else {
+    $cron_command = '/usr/local/sbin/mysqlbackup.sh'
+  }
   cron { 'mysql-backup':
     ensure  => $ensure,
-    command => '/usr/local/sbin/mysqlbackup.sh',
+    command => $cron_command,
     user    => 'root',
     hour    => 23,
     minute  => 5,
