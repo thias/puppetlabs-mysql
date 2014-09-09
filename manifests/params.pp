@@ -1,4 +1,4 @@
-# Class: mysql::params
+# Class: mysql0::params
 #
 #   The mysql configuration settings.
 #
@@ -10,7 +10,7 @@
 #
 # Sample Usage:
 #
-class mysql::params {
+class mysql0::params {
 
   $bind_address        = '127.0.0.1'
   $port                = 3306

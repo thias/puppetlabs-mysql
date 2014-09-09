@@ -61,8 +61,8 @@ class mysql::backup (
   }
 
   $backup_template = $backupsplitdb ? {
-    true  => 'mysql/mysqlbackup-splitdb.sh.erb',
-    false => 'mysql/mysqlbackup.sh.erb',
+    true  => 'mysql0/mysqlbackup-splitdb.sh.erb',
+    false => 'mysql0/mysqlbackup.sh.erb',
   }
   file { 'mysqlbackup.sh':
     ensure  => $ensure,

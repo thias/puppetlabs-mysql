@@ -1,4 +1,4 @@
-# Class: mysql::server
+# Class: mysql0::server
 #
 # manages the installation of the mysql server.  manages the package, service,
 # my.cnf
@@ -14,22 +14,25 @@
 #
 # Sample Usage:
 #
-class mysql::server (
-  $package_name     = $mysql::params::server_package_name,
+class mysql0::server (
+  $package_name     = $mysql0::params::server_package_name,
   $package_ensure   = 'present',
-  $service_name     = $mysql::params::service_name,
-  $service_provider = $mysql::params::service_provider,
+  $service_name     = $mysql0::params::service_name,
+  $service_provider = $mysql0::params::service_provider,
   $config_hash      = {},
   $enabled          = true,
   $manage_service   = true,
   $backup           = false
-) inherits mysql::params {
+) inherits mysql0::params {
 
-  Class['mysql::server'] -> Class['mysql::config']
+  Class['mysql0::server'] -> Class['mysql0::config']
 
-  $config_class = { 'mysql::config' => $config_hash }
+  $config_class = { 'mysql0::config' => $config_hash }
 
-  create_resources( 'class', $config_class )
+  #create_resources( 'class', $config_class )
+  class { '::mysql0::config':
+    root_password => $config_hash['root_password'],
+  }
 
   package { 'mysql-server':
     ensure => $package_ensure,
@@ -54,7 +57,7 @@ class mysql::server (
 
   if $backup {
     # Rely on hiera to look parameters up when using this
-    include '::mysql::backup'
+    include '::mysql0::backup'
   }
 
 }

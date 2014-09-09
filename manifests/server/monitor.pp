@@ -1,10 +1,10 @@
-class mysql::server::monitor (
+class mysql0::server::monitor (
   $mysql_monitor_username,
   $mysql_monitor_password,
   $mysql_monitor_hostname
 ) {
 
-  Class['mysql::server'] -> Class['mysql::server::monitor']
+  Class['mysql0::server'] -> Class['mysql0::server::monitor']
 
   database_user{ "${mysql_monitor_username}@${mysql_monitor_hostname}":
     ensure        => present,

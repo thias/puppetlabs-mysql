@@ -1,4 +1,4 @@
-# Class: mysql::config
+# Class: mysql0::config
 #
 # Parameters:
 #
@@ -24,36 +24,36 @@
 #
 # Requires:
 #
-#   class mysql::server
+#   class mysql0::server
 #
 # Usage:
 #
-#   class { 'mysql::config':
+#   class { 'mysql0::config':
 #     root_password => 'changeme',
 #     bind_address  => $::ipaddress,
 #   }
 #
-class mysql::config(
+class mysql0::config(
   $root_password     = 'UNSET',
   $old_root_password = '',
-  $bind_address      = $mysql::params::bind_address,
-  $port              = $mysql::params::port,
-  $etc_root_password = $mysql::params::etc_root_password,
-  $service_name      = $mysql::params::service_name,
-  $config_file       = $mysql::params::config_file,
-  $socket            = $mysql::params::socket,
-  $pidfile           = $mysql::params::pidfile,
-  $datadir           = $mysql::params::datadir,
-  $ssl               = $mysql::params::ssl,
-  $ssl_ca            = $mysql::params::ssl_ca,
-  $ssl_cert          = $mysql::params::ssl_cert,
-  $ssl_key           = $mysql::params::ssl_key,
-  $log_error         = $mysql::params::log_error,
+  $bind_address      = $mysql0::params::bind_address,
+  $port              = $mysql0::params::port,
+  $etc_root_password = $mysql0::params::etc_root_password,
+  $service_name      = $mysql0::params::service_name,
+  $config_file       = $mysql0::params::config_file,
+  $socket            = $mysql0::params::socket,
+  $pidfile           = $mysql0::params::pidfile,
+  $datadir           = $mysql0::params::datadir,
+  $ssl               = $mysql0::params::ssl,
+  $ssl_ca            = $mysql0::params::ssl_ca,
+  $ssl_cert          = $mysql0::params::ssl_cert,
+  $ssl_key           = $mysql0::params::ssl_key,
+  $log_error         = $mysql0::params::log_error,
   $default_engine    = 'UNSET',
-  $root_group        = $mysql::params::root_group,
-  $restart           = $mysql::params::restart,
+  $root_group        = $mysql0::params::root_group,
+  $restart           = $mysql0::params::restart,
   $purge_conf_dir    = false
-) inherits mysql::params {
+) inherits mysql0::params {
 
   File {
     owner  => 'root',
@@ -107,13 +107,13 @@ class mysql::config(
     }
 
     file { '/root/.my.cnf':
-      content => template('mysql/my.cnf.pass.erb'),
+      content => template('mysql0/my.cnf.pass.erb'),
       require => Exec['set_mysql_rootpw'],
     }
 
     if $etc_root_password {
       file{ '/etc/my.cnf':
-        content => template('mysql/my.cnf.pass.erb'),
+        content => template('mysql0/my.cnf.pass.erb'),
         require => Exec['set_mysql_rootpw'],
       }
     }
@@ -134,7 +134,7 @@ class mysql::config(
     purge   => $purge_conf_dir,
   }
   file { $config_file:
-    content => template('mysql/my.cnf.erb'),
+    content => template('mysql0/my.cnf.erb'),
     mode    => '0644',
   }
 
