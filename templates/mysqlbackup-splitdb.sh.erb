@@ -40,6 +40,7 @@ echo "Dumping all databases"
 echo "====================="
 cd ${MYSQLDIR} || die "Cannot get into data directory."
 for database in `mysql --skip-column-names -e "show databases"`; do
+    [ "${database}" == 'information_schema' ] && continue
     if [ ! -d ${DESTDIR}/$database ]; then
         mkdir ${DESTDIR}/$database || die "Cannot create $database dir."
     fi

@@ -23,7 +23,7 @@
 #     backupcompress => true,
 #   }
 #
-class mysql::backup (
+class mysql0::backup (
   $backupuser,
   $backuppassword,
   $backupdir,
@@ -38,7 +38,7 @@ class mysql::backup (
     ensure        => $ensure,
     password_hash => mysql_password($backuppassword),
     provider      => 'mysql',
-    require       => Class['mysql::config'],
+    require       => Class['mysql0::config'],
   }
 
   database_grant { "${backupuser}@localhost":
